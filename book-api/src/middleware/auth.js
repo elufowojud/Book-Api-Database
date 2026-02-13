@@ -4,7 +4,6 @@ const User = require('../models/user');
 // Middleware to verify JWT token
 async function authenticate(ctx, next) {
   try {
-    // Get token from Authorization header
     const authHeader = ctx.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -14,11 +13,7 @@ async function authenticate(ctx, next) {
     }
 
     const token = authHeader.split(' ')[1];
-
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Get user from database
     const user = await User.findById(decoded.id);
     
     if (!user) {
@@ -27,12 +22,9 @@ async function authenticate(ctx, next) {
       return;
     }
 
-    // Attach user to context
     ctx.state.user = user;
-
     await next();
   } catch (error) {
-    console.error('Authentication error:', error);
     ctx.status = 401;
     ctx.body = { error: 'Invalid or expired token' };
   }
