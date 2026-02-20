@@ -12,6 +12,34 @@ class Book {
     return rows;
   }
 
+  // Get all books with pagination
+  static async getAllPaginated(page = 1, limit = 10) {
+    const offset = (page - 1) * limit;
+    
+    // Get total count
+    const [countResult] = await db.query('SELECT COUNT(*) as total FROM books');
+    const total = countResult[0].total;
+    
+    // Get paginated results
+    const [rows] = await db.query(`
+      SELECT b.*, a.name as author_name 
+      FROM books b
+      LEFT JOIN authors a ON b.author_id = a.id
+      ORDER BY b.title ASC
+      LIMIT ? OFFSET ?
+    `, [limit, offset]);
+    
+    return {
+      books: rows,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
+  }
+
   // Get single book by ID
   static async getById(id) {
     const [rows] = await db.query(`
@@ -53,15 +81,15 @@ class Book {
     return result.affectedRows > 0;
   }
 
-  // Search books by title or genre
+  // Search books by title, genre, or author
   static async search(query) {
     const [rows] = await db.query(`
       SELECT b.*, a.name as author_name 
       FROM books b
       LEFT JOIN authors a ON b.author_id = a.id
-      WHERE b.title LIKE ? OR b.genre LIKE ?
+      WHERE b.title LIKE ? OR b.genre LIKE ? OR a.name LIKE ?
       ORDER BY b.title ASC
-    `, [`%${query}%`, `%${query}%`]);
+    `, [`%${query}%`, `%${query}%`, `%${query}%`]);
     return rows;
   }
 }

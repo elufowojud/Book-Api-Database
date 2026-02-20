@@ -22,9 +22,12 @@ app.use(async (ctx) => {
   if (path === '/' && method === 'GET') {
     ctx.body = {
       message: 'Book Database API',
+      version: '2.0.0',
       endpoints: {
         authors: 'GET /authors',
         books: 'GET /books',
+        books_paginated: 'GET /books?page=1&limit=10',
+        search_books: 'GET /books?search=query',
         reviews: 'GET /reviews',
         login: 'POST /auth/login'
       }
@@ -147,11 +150,85 @@ app.use(async (ctx) => {
     return;
   }
 
-  // GET ALL BOOKS
+  // UPDATE AUTHOR (ADMIN)
+  if (path.match(/^\/authors\/\d+$/) && method === 'PUT') {
+    try {
+      await authenticate(ctx, async () => {
+        await requireAdmin(ctx, async () => {
+          const id = path.split('/')[2];
+          const { name, bio, birth_year, nationality } = ctx.request.body;
+          
+          if (!name) {
+            ctx.status = 400;
+            ctx.body = { error: 'Name required' };
+            return;
+          }
+
+          const author = await Author.getById(id);
+          if (!author) {
+            ctx.status = 404;
+            ctx.body = { error: 'Author not found' };
+            return;
+          }
+
+          const updated = await Author.update(id, name, bio, birth_year, nationality);
+          ctx.body = { message: 'Author updated', author: updated };
+        });
+      });
+    } catch (error) {
+      if (!ctx.body) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+      }
+    }
+    return;
+  }
+
+  // DELETE AUTHOR (ADMIN)
+  if (path.match(/^\/authors\/\d+$/) && method === 'DELETE') {
+    try {
+      await authenticate(ctx, async () => {
+        await requireAdmin(ctx, async () => {
+          const id = path.split('/')[2];
+          
+          const author = await Author.getById(id);
+          if (!author) {
+            ctx.status = 404;
+            ctx.body = { error: 'Author not found' };
+            return;
+          }
+
+          await Author.delete(id);
+          ctx.body = { message: 'Author deleted successfully' };
+        });
+      });
+    } catch (error) {
+      if (!ctx.body) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+      }
+    }
+    return;
+  }
+
+  // GET ALL BOOKS (with pagination and search)
   if (path === '/books' && method === 'GET') {
     try {
-      const books = await Book.getAll();
-      ctx.body = books;
+      const url = new URL(`http://localhost${ctx.url}`);
+      const page = parseInt(url.searchParams.get('page')) || 1;
+      const limit = parseInt(url.searchParams.get('limit')) || 10;
+      const search = url.searchParams.get('search');
+
+      if (search) {
+        const books = await Book.search(search);
+        ctx.body = { books, count: books.length };
+      } else if (url.searchParams.has('page') || url.searchParams.has('limit')) {
+        const result = await Book.getAllPaginated(page, limit);
+        ctx.body = result;
+      } else {
+        const books = await Book.getAll();
+        ctx.body = books;
+      }
     } catch (error) {
       ctx.status = 500;
       ctx.body = { error: error.message };
@@ -191,6 +268,67 @@ app.use(async (ctx) => {
           const book = await Book.create(title, author_id, isbn, publication_year, genre, description);
           ctx.status = 201;
           ctx.body = { message: 'Book created', book };
+        });
+      });
+    } catch (error) {
+      if (!ctx.body) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+      }
+    }
+    return;
+  }
+
+  // UPDATE BOOK (ADMIN)
+  if (path.match(/^\/books\/\d+$/) && method === 'PUT') {
+    try {
+      await authenticate(ctx, async () => {
+        await requireAdmin(ctx, async () => {
+          const id = path.split('/')[2];
+          const { title, author_id, isbn, publication_year, genre, description } = ctx.request.body;
+          
+          if (!title || !author_id) {
+            ctx.status = 400;
+            ctx.body = { error: 'Title and author_id required' };
+            return;
+          }
+
+          const book = await Book.getById(id);
+          if (!book) {
+            ctx.status = 404;
+            ctx.body = { error: 'Book not found' };
+            return;
+          }
+
+          const updated = await Book.update(id, title, author_id, isbn, publication_year, genre, description);
+          ctx.body = { message: 'Book updated', book: updated };
+        });
+      });
+    } catch (error) {
+      if (!ctx.body) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+      }
+    }
+    return;
+  }
+
+  // DELETE BOOK (ADMIN)
+  if (path.match(/^\/books\/\d+$/) && method === 'DELETE') {
+    try {
+      await authenticate(ctx, async () => {
+        await requireAdmin(ctx, async () => {
+          const id = path.split('/')[2];
+          
+          const book = await Book.getById(id);
+          if (!book) {
+            ctx.status = 404;
+            ctx.body = { error: 'Book not found' };
+            return;
+          }
+
+          await Book.delete(id);
+          ctx.body = { message: 'Book deleted successfully' };
         });
       });
     } catch (error) {
