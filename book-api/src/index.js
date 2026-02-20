@@ -7,6 +7,7 @@ const db = require('./config/database');
 const User = require('./models/user');
 const Author = require('./models/author');
 const Book = require('./models/book');
+const Review = require('./models/review');
 const { authenticate, requireAdmin } = require('./middleware/auth');
 
 const app = new Koa();
@@ -24,6 +25,7 @@ app.use(async (ctx) => {
       endpoints: {
         authors: 'GET /authors',
         books: 'GET /books',
+        reviews: 'GET /reviews',
         login: 'POST /auth/login'
       }
     };
@@ -190,6 +192,133 @@ app.use(async (ctx) => {
           ctx.status = 201;
           ctx.body = { message: 'Book created', book };
         });
+      });
+    } catch (error) {
+      if (!ctx.body) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+      }
+    }
+    return;
+  }
+
+  // ========== REVIEWS: GET ALL ==========
+  if (path === '/reviews' && method === 'GET') {
+    try {
+      const reviews = await Review.getAll();
+      ctx.body = reviews;
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { error: error.message };
+    }
+    return;
+  }
+
+  // ========== REVIEWS: GET BY BOOK ID ==========
+  if (path.match(/^\/books\/\d+\/reviews$/) && method === 'GET') {
+    try {
+      const bookId = path.split('/')[2];
+      const reviews = await Review.getByBookId(bookId);
+      ctx.body = reviews;
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { error: error.message };
+    }
+    return;
+  }
+
+  // ========== REVIEWS: CREATE (AUTHENTICATED) ==========
+  if (path === '/reviews' && method === 'POST') {
+    try {
+      await authenticate(ctx, async () => {
+        const { book_id, rating, comment } = ctx.request.body;
+
+        if (!book_id || !rating) {
+          ctx.status = 400;
+          ctx.body = { error: 'book_id and rating are required' };
+          return;
+        }
+
+        if (rating < 1 || rating > 5) {
+          ctx.status = 400;
+          ctx.body = { error: 'Rating must be between 1 and 5' };
+          return;
+        }
+
+        const review = await Review.create(book_id, ctx.state.user.id, rating, comment);
+        ctx.status = 201;
+        ctx.body = { message: 'Review created', review };
+      });
+    } catch (error) {
+      if (!ctx.body) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+      }
+    }
+    return;
+  }
+
+  // ========== REVIEWS: UPDATE (OWN REVIEWS ONLY) ==========
+  if (path.match(/^\/reviews\/\d+$/) && method === 'PUT') {
+    try {
+      await authenticate(ctx, async () => {
+        const reviewId = path.split('/')[2];
+        const { rating, comment } = ctx.request.body;
+
+        if (!rating) {
+          ctx.status = 400;
+          ctx.body = { error: 'Rating is required' };
+          return;
+        }
+
+        if (rating < 1 || rating > 5) {
+          ctx.status = 400;
+          ctx.body = { error: 'Rating must be between 1 and 5' };
+          return;
+        }
+
+        const belongsToUser = await Review.belongsToUser(reviewId, ctx.state.user.id);
+        if (!belongsToUser) {
+          ctx.status = 403;
+          ctx.body = { error: 'You can only update your own reviews' };
+          return;
+        }
+
+        const review = await Review.update(reviewId, rating, comment);
+        ctx.body = { message: 'Review updated', review };
+      });
+    } catch (error) {
+      if (!ctx.body) {
+        ctx.status = 500;
+        ctx.body = { error: error.message };
+      }
+    }
+    return;
+  }
+
+  // ========== REVIEWS: DELETE (OWN REVIEWS ONLY OR ADMIN) ==========
+  if (path.match(/^\/reviews\/\d+$/) && method === 'DELETE') {
+    try {
+      await authenticate(ctx, async () => {
+        const reviewId = path.split('/')[2];
+
+        const belongsToUser = await Review.belongsToUser(reviewId, ctx.state.user.id);
+        const isAdmin = ctx.state.user.role === 'admin';
+
+        if (!belongsToUser && !isAdmin) {
+          ctx.status = 403;
+          ctx.body = { error: 'You can only delete your own reviews' };
+          return;
+        }
+
+        const deleted = await Review.delete(reviewId);
+        if (!deleted) {
+          ctx.status = 404;
+          ctx.body = { error: 'Review not found' };
+          return;
+        }
+
+        ctx.body = { message: 'Review deleted successfully' };
       });
     } catch (error) {
       if (!ctx.body) {
