@@ -6,6 +6,7 @@ import AuthorsView from "../views/AuthorsView.vue";
 import AuthorDetailView from "../views/AuthorDetailView.vue";
 import LoginView from "../views/LoginView.vue";
 import RegisterView from "../views/RegisterView.vue";
+import AdminDashboardView from "../views/AdminDashboardView.vue";
 
 const routes = [
   {
@@ -42,6 +43,11 @@ const routes = [
     path: "/register",
     name: "register",
     component: RegisterView,
+  },
+  {
+    path: "/admin",
+    name: "admin",
+    component: AdminDashboardView,
   },
 ];
 

@@ -7,7 +7,8 @@
           <router-link to="/">Home</router-link>
           <router-link to="/books">Books</router-link>
           <router-link to="/authors">Authors</router-link>
-          <router-link to="/login" v-if="!isLoggedIn">Login</router-link>
+          <router-link v-if="isAdmin" to="/admin">Admin</router-link>
+          <router-link v-if="!isLoggedIn" to="/login">Login</router-link>
           <button v-if="isLoggedIn" @click="logout" class="btn-logout">
             Logout
           </button>
@@ -26,6 +27,12 @@ export default {
   computed: {
     isLoggedIn() {
       return !!localStorage.getItem("token");
+    },
+    isAdmin() {
+      const user = localStorage.getItem("user");
+      if (!user) return false;
+      const userData = JSON.parse(user);
+      return userData.role === "admin";
     },
   },
   methods: {
