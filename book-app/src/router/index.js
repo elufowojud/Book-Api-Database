@@ -7,6 +7,7 @@ import AuthorDetailView from "../views/AuthorDetailView.vue";
 import LoginView from "../views/LoginView.vue";
 import RegisterView from "../views/RegisterView.vue";
 import AdminDashboardView from "../views/AdminDashboardView.vue";
+import NotFoundView from "../views/NotFoundView.vue";
 
 const routes = [
   {
@@ -48,6 +49,11 @@ const routes = [
     path: "/admin",
     name: "admin",
     component: AdminDashboardView,
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "not-found",
+    component: NotFoundView,
   },
 ];
 

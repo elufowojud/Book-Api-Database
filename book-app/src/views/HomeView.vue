@@ -141,4 +141,21 @@ export default {
   font-size: 0.875rem;
   margin-top: 0.5rem;
 }
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .book-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

@@ -137,4 +137,13 @@ export default {
   text-decoration: none;
   display: inline-block;
 }
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .authors-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

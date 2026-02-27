@@ -466,4 +466,20 @@ textarea:focus {
   color: #95a5a6;
   font-size: 0.9rem;
 }
+@media (max-width: 768px) {
+  .book-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .book-info,
+  .reviews-section {
+    padding: 1.5rem;
+  }
+
+  .reviews-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
 </style>

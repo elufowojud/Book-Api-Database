@@ -253,4 +253,28 @@ export default {
   opacity: 0.5;
   cursor: not-allowed;
 }
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .books-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-input {
+    font-size: 0.9rem;
+  }
+
+  .book-card {
+    padding: 1rem;
+  }
+}
 </style>
