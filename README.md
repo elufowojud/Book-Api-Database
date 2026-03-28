@@ -1,9 +1,9 @@
 # 📚 Book Database API - Full Stack Application
 
 **Module:** 6005CMD - Full Stack Development  
-**Student:** [Your Name]  
-**Student ID:** [Your Student ID]  
-**GitHub:** [Your GitHub Username]  
+**Student:** Elufowoju David  
+**Student ID:** 13122803 
+**GitHub:** elufowojud
 **Submission Date:** March 2026
 
 ---
@@ -13,7 +13,7 @@
 A comprehensive full-stack web application for managing a book database with user authentication, reviews, and admin controls. Built with Node.js/Koa backend and Vue.js frontend.
 
 **Live Demo:** [If deployed, add link here]  
-**Repository:** https://github.coventry.ac.uk/[YOUR-USERNAME]/6005CMD-book-api
+**Repository:** https://github.coventry.ac.uk/elufowojud/6005CMD-book-api
 
 ---
 
@@ -141,7 +141,7 @@ A comprehensive full-stack web application for managing a book database with use
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.coventry.ac.uk/[YOUR-USERNAME]/6005CMD-book-api.git
+git clone https://github.coventry.ac.uk/elufowojud/6005CMD-book-api.git
 cd 6005CMD-book-api
 ```
 
@@ -224,7 +224,7 @@ App runs on `http://localhost:8080`
 ## 👤 Default Accounts
 
 ### Admin Account
-- **Email:** myadmin@example.com
+- **Email:** admin@test.com
 - **Password:** admin123
 - **Role:** admin
 
@@ -262,7 +262,6 @@ Comprehensive testing performed on all features:
 ### Admin Dashboard
 ![Admin](screenshots/admin.png)
 
-*(Note: Add screenshots to a `screenshots/` folder)*
 
 ---
 
@@ -359,9 +358,9 @@ This project is submitted as coursework for Coventry University and is for educa
 
 ## 📧 Contact
 
-**Student:** [Your Name]  
-**Email:** [Your Coventry Email]  
-**Student ID:** [Your Student ID]  
+**Student:** Elufowoju David  
+**Email:** elufowojud@coventry.ac.uk  
+**Student ID:** 13122803  
 **Submission Date:** March 2026
 
 ---
