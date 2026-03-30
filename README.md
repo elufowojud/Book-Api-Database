@@ -12,7 +12,7 @@
 
 A comprehensive full-stack web application for managing a book database with user authentication, reviews, and admin controls. Built with Node.js/Koa backend and Vue.js frontend.
 
-**Live Demo:** [If deployed, add link here]  
+**Live Demo:** https://youtu.be/jWMainN-SMU  
 **Repository:** https://github.coventry.ac.uk/elufowojud/6005CMD-book-api
 
 ---
