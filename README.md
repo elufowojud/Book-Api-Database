@@ -371,6 +371,6 @@ This project is submitted as coursework for Coventry University and is for educa
 
 **Lines of Code:** ~5000+ (Backend + Frontend)
 
------
+---
 
 *Last Updated: February 23, 2026*
